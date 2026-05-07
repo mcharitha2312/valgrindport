@@ -1,0 +1,13 @@
+diff --git a/coregrind/pub_core_options.h b/coregrind/pub_core_options.h
+index d8bc4736d..da047e645 100644
+--- a/coregrind/pub_core_options.h
++++ b/coregrind/pub_core_options.h
+@@ -132,7 +132,7 @@ extern const HChar* VG_(clo_trace_children_skip_by_arg);
+    after the subsequent exec(). */
+ extern Bool  VG_(clo_child_silent_after_fork);
+ 
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ /* If True, valgrind will attempt to query debuginfod servers for
+    any missing debuginfo. */
+ extern Bool VG_(clo_enable_debuginfod);

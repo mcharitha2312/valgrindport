@@ -1,0 +1,128 @@
+diff --git a/coregrind/m_libcproc.c b/coregrind/m_libcproc.c
+index 280ab1cff..2a8602aff 100644
+--- a/coregrind/m_libcproc.c
++++ b/coregrind/m_libcproc.c
+@@ -67,7 +67,8 @@ HChar** VG_(client_envp) = NULL;
+ const HChar *VG_(libdir) = VG_LIBDIR;
+ 
+ const HChar *VG_(LD_PRELOAD_var_name) =
+-#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++    || defined(VGO_openedition)
+    "LD_PRELOAD";
+ #elif defined(VGO_darwin)
+    "DYLD_INSERT_LIBRARIES";
+@@ -348,7 +349,7 @@ void VG_(client_cmd_and_args)(HChar *buffer, SizeT buf_size)
+ 
+ Int VG_(waitpid)(Int pid, Int *status, Int options)
+ {
+-#  if defined(VGO_linux) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_freebsd) || defined(VGO_openedition)
+    SysRes res = VG_(do_syscall4)(__NR_wait4,
+                                  pid, (UWord)status, options, 0);
+    return sr_isError(res) ? -1 : sr_Res(res);
+@@ -679,7 +680,7 @@ Int VG_(prctl) (Int option,
+ 
+ Int VG_(gettid)(void)
+ {
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) || defined(VGO_openedition)
+    SysRes res = VG_(do_syscall0)(__NR_gettid);
+ 
+    if (sr_isError(res) && sr_Res(res) == VKI_ENOSYS) {
+@@ -755,7 +756,8 @@ Int VG_(getpgrp) ( void )
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux)
+    return sr_Res( VG_(do_syscall1)(__NR_getpgid, 0) );
+-#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd) \
++        || defined(VGO_openedition)
+    return sr_Res( VG_(do_syscall0)(__NR_getpgrp) );
+ #  elif defined(VGO_solaris)
+    /* Uses the shared pgrpsys syscall, 0 for the getpgrp variant. */
+@@ -768,7 +770,8 @@ Int VG_(getpgrp) ( void )
+ Int VG_(getppid) ( void )
+ {
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+-#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    return sr_Res( VG_(do_syscall0)(__NR_getppid) );
+ #  elif defined(VGO_solaris)
+    /* Uses the shared getpid/getppid syscall, val2 contains a parent pid. */
+@@ -781,7 +784,8 @@ Int VG_(getppid) ( void )
+ Int VG_(geteuid) ( void )
+ {
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+-#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    {
+ #     if defined(__NR_geteuid32)
+       // We use the 32-bit version if it's supported.  Otherwise, IDs greater
+@@ -802,7 +806,8 @@ Int VG_(geteuid) ( void )
+ 
+ Int VG_(getegid) ( void )
+ {
+-#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+ #    if defined(__NR_getegid32)
+    // We use the 32-bit version if it's supported.  Otherwise, IDs greater
+@@ -850,7 +855,7 @@ Int VG_(getgroups)( Int size, UInt* list )
+         || defined(VGO_darwin) || defined(VGP_s390x_linux)    \
+         || defined(VGP_mips32_linux) || defined(VGP_arm64_linux) \
+         || defined(VGO_solaris) || defined(VGP_nanomips_linux) \
+-        || defined(VGO_freebsd)
++        || defined(VGO_freebsd) || defined(VGO_openedition)
+    SysRes sres;
+    sres = VG_(do_syscall2)(__NR_getgroups, size, (Addr)list);
+    if (sr_isError(sres))
+@@ -869,7 +874,8 @@ Int VG_(getgroups)( Int size, UInt* list )
+ Int VG_(ptrace) ( Int request, Int pid, void *addr, void *data )
+ {
+    SysRes res;
+-#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    res = VG_(do_syscall4)(__NR_ptrace, request, pid, (UWord)addr, (UWord)data);
+ #  elif defined(VGO_solaris)
+    /* There is no ptrace syscall on Solaris.  Such requests has to be
+@@ -960,7 +966,7 @@ Int VG_(fork) ( void )
+    register_sigchld_ignore(sr_Res(res), fds);
+    return sr_Res(res);
+ 
+-#  elif defined(VGO_linux) || defined(VGO_freebsd)
++#  elif defined(VGO_linux) || defined(VGO_freebsd) || defined(VGO_openedition)
+    SysRes res;
+    res = VG_(do_syscall0)(__NR_fork);
+    if (sr_isError(res))
+@@ -1016,7 +1022,7 @@ UInt VG_(read_millisecond_timer) ( void )
+    static ULong base = 0;
+    ULong  now;
+ 
+-#  if defined(VGO_linux) || defined(VGO_solaris)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_openedition)
+    { SysRes res;
+      struct vki_timespec ts_now;
+      res = VG_(do_syscall2)(__NR_clock_gettime, VKI_CLOCK_MONOTONIC,
+@@ -1063,7 +1069,8 @@ UInt VG_(read_millisecond_timer) ( void )
+    return (now - base) / 1000;
+ }
+ 
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+ void VG_(clock_gettime) ( struct vki_timespec *ts, vki_clockid_t clk_id )
+ {
+     SysRes res;
+@@ -1094,7 +1101,7 @@ Int VG_(gettimeofday)(struct vki_timeval *tv, struct vki_timezone *tz)
+ UInt VG_(get_user_milliseconds)(void)
+ {
+    UInt res = 0;
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) || defined(VGO_openedition)
+    {
+       struct vki_rusage ru;
+       VG_(memset)(&ru, 0, sizeof(ru));

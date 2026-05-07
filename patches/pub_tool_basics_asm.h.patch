@@ -1,0 +1,23 @@
+diff --git a/include/pub_tool_basics_asm.h b/include/pub_tool_basics_asm.h
+index 99f2ab18e..3c6da25c9 100644
+--- a/include/pub_tool_basics_asm.h
++++ b/include/pub_tool_basics_asm.h
+@@ -46,7 +46,8 @@
+ 
+ #define VGAPPEND(str1,str2) str1##str2
+  
+-#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++    || defined(VGO_openedition)
+ #  define VG_(str)    VGAPPEND( vgPlain_,          str)
+ #  define ML_(str)    VGAPPEND( vgModuleLocal_,    str)
+ #elif defined(VGO_darwin)
+@@ -60,7 +61,7 @@
+    The call to MARK_STACK_NO_EXEC should be put unconditionally
+    at the end of all asm source files.
+ */
+-#if defined(VGO_linux) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_freebsd) || defined(VGO_openedition)
+ #  if defined(VGA_arm)
+ #    define MARK_STACK_NO_EXEC .section .note.GNU-stack,"",%progbits
+ #  else

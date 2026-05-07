@@ -1,0 +1,14 @@
+diff --git a/coregrind/pub_core_mallocfree.h b/coregrind/pub_core_mallocfree.h
+index 6f0cd293b..b7d445251 100644
+--- a/coregrind/pub_core_mallocfree.h
++++ b/coregrind/pub_core_mallocfree.h
+@@ -84,7 +84,8 @@ typedef Int ArenaId;
+       defined(VGP_x86_darwin)     || \
+       defined(VGP_amd64_darwin)   || \
+       defined(VGP_arm64_linux)    || \
+-      defined(VGP_amd64_solaris)
++      defined(VGP_amd64_solaris)  || \
++      defined(VGP_s390x_openedition)
+ #  define VG_MIN_MALLOC_SZB       16
+ #else
+ #  error Unknown platform

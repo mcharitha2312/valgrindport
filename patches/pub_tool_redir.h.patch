@@ -1,0 +1,32 @@
+diff --git a/include/pub_tool_redir.h b/include/pub_tool_redir.h
+index f88d3b571..a5052366a 100644
+--- a/include/pub_tool_redir.h
++++ b/include/pub_tool_redir.h
+@@ -241,7 +241,8 @@
+ 
+ /* --- Soname of the standard C library. --- */
+ 
+-#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++    || defined(VGO_openedition)
+ # if defined(MUSL_LIBC)
+ #  define  VG_Z_LIBC_SONAME  libcZdZa              // libc.*
+ #else
+@@ -281,7 +282,7 @@
+ 
+ /* --- Soname of the pthreads library. --- */
+ 
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ #  define  VG_Z_LIBPTHREAD_SONAME  libpthreadZdsoZd0     // libpthread.so.0
+ #elif defined(VGO_freebsd)
+ #  define  VG_Z_LIBPTHREAD_SONAME  libthrZdsoZa          // libthr.so*
+@@ -409,7 +410,7 @@ Bool VG_(is_soname_ld_so) (const HChar *soname);
+ #define VG_WRAP_THREAD_FUNCTION_LIBPTHREAD_ONLY
+ #elif defined(VGO_solaris) || (defined(VGO_linux) && defined(MUSL_LIBC))
+ #define VG_WRAP_THREAD_FUNCTION_LIBC_ONLY
+-#elif defined(VGO_linux)
++#elif defined(VGO_linux) || defined(VGO_openedition)
+ #define VG_WRAP_THREAD_FUNCTION_LIBC_AND_LIBPTHREAD
+ #else
+ #  error "Unknown platform"

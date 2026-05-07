@@ -1,0 +1,31 @@
+diff --git a/coregrind/m_vki.c b/coregrind/m_vki.c
+index 0cc1882a1..b0c2f96e2 100644
+--- a/coregrind/m_vki.c
++++ b/coregrind/m_vki.c
+@@ -76,7 +76,8 @@ void VG_(vki_do_initial_consistency_checks) ( void )
+ 
+    /* --- Platform-specific checks on signal sets --- */
+ 
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    /* nothing to check */
+ #  elif defined(VGP_x86_darwin) || defined(VGP_amd64_darwin)
+    vg_assert(_VKI_NSIG == NSIG);
+@@ -128,13 +129,15 @@ void VG_(vki_do_initial_consistency_checks) ( void )
+       syscall-amd64-darwin.S */
+    vg_assert(VKI_SIG_SETMASK == 3);
+ 
+-#  elif defined(VGO_solaris)
++#  elif defined(VGO_solaris) || defined(VGO_openedition)
+    /* the toK- and fromK- forms are identical */
+    vg_assert(sizeof(vki_sigaction_toK_t)
+              == sizeof(vki_sigaction_fromK_t));
++#  if defined(VGO_solaris)
+    /* VKI_SET_SIGMASK is hardwired into syscall-x86-solaris.S
+       and syscall-amd64-solaris.S */
+    vg_assert(VKI_SIG_SETMASK == 3);
++#  endif
+ 
+ #  else
+ #     error "Unknown OS" 

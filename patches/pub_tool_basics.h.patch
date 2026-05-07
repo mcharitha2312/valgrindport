@@ -1,0 +1,56 @@
+diff --git a/include/pub_tool_basics.h b/include/pub_tool_basics.h
+index bf5a5ba7f..11d661c9c 100644
+--- a/include/pub_tool_basics.h
++++ b/include/pub_tool_basics.h
+@@ -63,11 +63,17 @@
+ // Likewise it is a mistake for a VG_ name to appear in a priv_*.h
+ // file. 
+ 
++#ifndef VGAPPEND
+ #define VGAPPEND(str1,str2) str1##str2
++#endif
+ 
++#ifndef VG_
+ #define VG_(str)    VGAPPEND(vgPlain_,          str)
+-#define ML_(str)    VGAPPEND(vgModuleLocal_,    str)
++#endif
+ 
++#ifndef ML_
++#define ML_(str)    VGAPPEND(vgModuleLocal_,    str)
++#endif
+ 
+ /* ---------------------------------------------------------------------
+    builtin types
+@@ -100,7 +106,7 @@ typedef  Word                 PtrdiffT;   // 32             64
+ // used in those cases.
+ // Nb: on Linux, off_t is a signed word-sized int.  On Darwin it's
+ // always a signed 64-bit int.  So we defined our own Off64T as well.
+-#if defined(VGO_linux) || defined(VGO_solaris)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_openedition)
+ typedef Word                   OffT;      // 32             64
+ #elif defined(VGO_freebsd)
+ typedef Long                   OffT;      // 64             64
+@@ -202,8 +208,9 @@ typedef
+    }
+    SysRes;
+ 
+-#elif defined(VGO_linux) \
+-      && !defined(VGP_mips32_linux) && !defined(VGP_mips64_linux)
++#elif (defined(VGO_linux) \
++      && !defined(VGP_mips32_linux) && !defined(VGP_mips64_linux)) \
++      || defined(VGO_openedition)
+ typedef
+    struct {
+       Bool  _isError;
+@@ -294,8 +301,9 @@ static inline Bool sr_EQ ( UInt sysno, SysRes sr1, SysRes sr2 ) {
+           && sr1._isError == sr2._isError;
+ }
+ 
+-#elif defined(VGO_linux) \
+-      && !defined(VGP_mips32_linux) && !defined(VGP_mips64_linux)
++#elif (defined(VGO_linux) \
++      && !defined(VGP_mips32_linux) && !defined(VGP_mips64_linux)) \
++      || defined(VGO_openedition)
+ 
+ static inline Bool sr_isError ( SysRes sr ) {
+    return sr._isError;

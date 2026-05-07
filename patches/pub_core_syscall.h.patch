@@ -1,0 +1,12 @@
+diff --git a/coregrind/pub_core_syscall.h b/coregrind/pub_core_syscall.h
+index 5c42821c8..b1f4120b7 100644
+--- a/coregrind/pub_core_syscall.h
++++ b/coregrind/pub_core_syscall.h
+@@ -101,6 +101,7 @@ extern SysRes VG_(mk_SysRes_x86_darwin)  ( UChar scclass, Bool isErr,
+ extern SysRes VG_(mk_SysRes_amd64_darwin)( UChar scclass, Bool isErr,
+                                            ULong wHI, ULong wLO );
+ extern SysRes VG_(mk_SysRes_s390x_linux) ( Long val );
++extern SysRes VG_(mk_SysRes_s390x_openedition) ( Long val );
+ extern SysRes VG_(mk_SysRes_mips32_linux)( UWord v0, UWord v1,
+                                            UWord a3 );
+ extern SysRes VG_(mk_SysRes_mips64_linux)( ULong v0, ULong v1,

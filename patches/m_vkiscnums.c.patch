@@ -1,0 +1,13 @@
+diff --git a/coregrind/m_vkiscnums.c b/coregrind/m_vkiscnums.c
+index 76ae104af..a9aa90883 100644
+--- a/coregrind/m_vkiscnums.c
++++ b/coregrind/m_vkiscnums.c
+@@ -39,7 +39,7 @@
+ */
+ 
+ //---------------------------------------------------------------------------
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ //---------------------------------------------------------------------------
+ 
+ const HChar* VG_(sysnum_string)(Word sysnum)

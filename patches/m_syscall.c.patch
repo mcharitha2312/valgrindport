@@ -1,0 +1,58 @@
+diff --git a/coregrind/m_syscall.c b/coregrind/m_syscall.c
+index 6ab20694d..8ca60c5b0 100644
+--- a/coregrind/m_syscall.c
++++ b/coregrind/m_syscall.c
+@@ -85,7 +85,7 @@ SysRes VG_(mk_SysRes_SuccessEx) ( UWord res, UWord resEx ) {
+ }
+ 
+ 
+-#elif defined(VGO_linux) \
++#elif defined(VGO_linux) || defined(VGO_openedition) \
+       && !defined(VGP_mips32_linux) && !defined(VGP_mips64_linux)
+ 
+ /*
+@@ -182,6 +182,17 @@ SysRes VG_(mk_SysRes_s390x_linux) ( Long val ) {
+    return res;
+ }
+ 
++SysRes VG_(mk_SysRes_s390x_opendition) ( Long val ) {
++   SysRes res;
++   res._isError = val >= -4095 && val <= -1;
++   if (res._isError) {
++      res._val = -val;
++   } else {
++      res._val = val;
++   }
++   return res;
++}
++
+ SysRes VG_(mk_SysRes_arm_linux) ( Int val ) {
+    SysRes res;
+    res._isError = val >= -4095 && val <= -1;
+@@ -959,7 +970,7 @@ asm(".private_extern _do_syscall_mach_WRK\n"
+     "        retq                     \n"
+     );
+ 
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+ 
+ static UWord do_syscall_WRK (
+    UWord syscall_no,
+@@ -976,7 +987,7 @@ static UWord do_syscall_WRK (
+    register ULong __svcres asm("2");
+ 
+    __asm__ __volatile__ (
+-                 "lgr %%r1,%1\n\t"
++                 " lgr 1,%1\n\t"
+                  "svc 0\n\t"
+ 		: "=d" (__svcres)
+ 		: "a" (syscall_no),
+@@ -1284,7 +1295,7 @@ SysRes VG_(do_syscall) ( UWord sysno, RegWord a1, RegWord a2, RegWord a3,
+    }
+    return VG_(mk_SysRes_amd64_darwin)( scclass, err ? True : False, wHI, wLO );
+   
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+    UWord val;
+ 
+    if (sysno == __NR_mmap) {

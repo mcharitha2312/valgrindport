@@ -1,0 +1,57 @@
+diff --git a/coregrind/m_libcassert.c b/coregrind/m_libcassert.c
+index 257c26bc6..3848ab7c0 100644
+--- a/coregrind/m_libcassert.c
++++ b/coregrind/m_libcassert.c
+@@ -159,7 +159,42 @@
+         (srP)->misc.ARM64.x29 = block[2];                 \
+         (srP)->misc.ARM64.x30 = block[3];                 \
+       }
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) 
++#  define GET_STARTREGS(srP)                              \
++      { ULong ia;                                         \
++        ULong block[11];                                  \
++        __asm__ __volatile__(                             \
++           "bras %0, 0f;"                                 \
++           "0: "                                          \
++           "stg %%r15, 0(%1);"                            \
++           "stg %%r11, 8(%1);"                            \
++           "stg %%r14, 16(%1);"                           \
++           "std %%f0, 24(%1);"                            \
++           "std %%f1, 32(%1);"                            \
++           "std %%f2, 40(%1);"                            \
++           "std %%f3, 48(%1);"                            \
++           "std %%f4, 56(%1);"                            \
++           "std %%f5, 64(%1);"                            \
++           "std %%f6, 72(%1);"                            \
++           "std %%f7, 80(%1);"                            \
++           : /* out */   "=&r" (ia)                       \
++           : /* in */    "a" (&block[0])                  \
++           : /* trash */ "memory"                         \
++        );                                                \
++        (srP)->r_pc = ia;                                 \
++        (srP)->r_sp = block[0];                           \
++        (srP)->misc.S390X.r_fp = block[1];                \
++        (srP)->misc.S390X.r_lr = block[2];                \
++        (srP)->misc.S390X.r_f0 = block[3];                \
++        (srP)->misc.S390X.r_f1 = block[4];                \
++        (srP)->misc.S390X.r_f2 = block[5];                \
++        (srP)->misc.S390X.r_f3 = block[6];                \
++        (srP)->misc.S390X.r_f4 = block[7];                \
++        (srP)->misc.S390X.r_f5 = block[8];                \
++        (srP)->misc.S390X.r_f6 = block[9];                \
++        (srP)->misc.S390X.r_f7 = block[10];               \
++      }
++#elif defined(VGP_s390x_openedition) 
+ #  define GET_STARTREGS(srP)                              \
+       { ULong ia;                                         \
+         ULong block[11];                                  \
+@@ -308,7 +343,7 @@ static void exit_wrk( Int status, Bool gdbserver_call_allowed)
+ __attribute__ ((__noreturn__))
+ void VG_(exit_now)( Int status )
+ {
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+    (void)VG_(do_syscall1)(__NR_exit_group, status );
+ #elif defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd)
+    (void)VG_(do_syscall1)(__NR_exit, status );

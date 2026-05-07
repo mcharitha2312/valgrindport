@@ -1,0 +1,103 @@
+diff --git a/coregrind/m_main.c b/coregrind/m_main.c
+index 3eba026cc..b0f917c69 100644
+--- a/coregrind/m_main.c
++++ b/coregrind/m_main.c
+@@ -62,6 +62,7 @@
+ #include "pub_core_tooliface.h"
+ #include "pub_core_translate.h"     // For VG_(translate)
+ #include "pub_core_trampoline.h"
++#include "pub_core_basics_asm.h"
+ #include "pub_core_transtab.h"
+ #include "pub_core_inner.h"
+ #if defined(ENABLE_INNER_CLIENT_REQUEST)
+@@ -119,7 +120,7 @@ static void usage_NORETURN ( int need_help )
+ "    --log-fd=<number>         log messages to file descriptor [2=stderr]\n"
+ "    --log-file=<file>         log messages to <file>\n"
+ "    --log-socket=ipaddr:port  log messages to socket ipaddr:port\n"
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ "    --enable-debuginfod=no|yes query debuginfod servers for missing\n"
+ "                              debuginfo [yes]\n"
+ #endif
+@@ -631,7 +632,7 @@ static void process_option (Clo_Mode mode,
+    else if VG_BOOL_CLO(arg, "--run-cxx-freeres",  VG_(clo_run_cxx_freeres)) {}
+    else if VG_BOOL_CLOM(cloPD, arg, "--show-below-main",  VG_(clo_show_below_main)) {}
+    else if VG_BOOL_CLO(arg, "--keep-debuginfo",   VG_(clo_keep_debuginfo)) {}
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+    else if VG_BOOL_CLO(arg, "--enable-debuginfod", VG_(clo_enable_debuginfod)) {}
+ #endif
+    else if VG_BOOL_CLOM(cloPD, arg, "--time-stamp",       VG_(clo_time_stamp)) {}
+@@ -1614,7 +1615,8 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
+    if (!need_help) {
+       VG_(debugLog)(1, "main", "Create initial image\n");
+ 
+-#     if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd)
++#     if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) \
++      || defined(VGO_freebsd) || defined(VGO_openedition)
+       the_iicii.argv              = argv;
+       the_iicii.envp              = envp;
+       the_iicii.toolname          = VG_(clo_toolname);
+@@ -1653,13 +1655,13 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
+    VG_(cl_psinfo_fd) = -1;
+ #endif
+ 
+-#if defined(VGO_linux) || defined(VGO_solaris)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_openedition)
+    if (!need_help) {
+       HChar  buf[50];   // large enough
+       HChar  buf2[VG_(mkstemp_fullname_bufsz)(sizeof buf - 1)];
+       Int    fd, r;
+ 
+-#if defined(VGO_linux) || defined(SOLARIS_PROC_CMDLINE)
++#if defined(VGO_linux) || defined(SOLARIS_PROC_CMDLINE) || defined(VGO_openedition)
+       /* Fake /proc/<pid>/cmdline only on Linux and Solaris if supported. */
+       HChar  nul[1];
+       const HChar* exename;
+@@ -1885,7 +1887,8 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
+    addr2dihandle = VG_(newXA)( VG_(malloc), "main.vm.2",
+                                VG_(free), sizeof(Addr_n_ULong) );
+ 
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++      || defined(VGO_openedition)
+    { Addr* seg_starts;
+      Int   n_seg_starts;
+      Addr_n_ULong anu;
+@@ -2425,7 +2428,7 @@ void shutdown_actions_NORETURN( ThreadId tid,
+ */
+ static void final_tidyup(ThreadId tid)
+ {
+-#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) || defined(VGO_openedition)
+    Addr freeres_wrapper = VG_(client_freeres_wrapper);
+ 
+    vg_assert(VG_(is_running_thread)(tid));
+@@ -2593,7 +2596,7 @@ static void final_tidyup(ThreadId tid)
+ /*=== Getting to main() alive: LINUX                               ===*/
+ /*====================================================================*/
+ 
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ 
+ /* If linking of the final executables is done with glibc present,
+    then Valgrind starts at main() above as usual, and all of the
+@@ -2934,6 +2937,8 @@ asm("\n\t"
+     "2:   .quad "VG_STRINGIFY(VG_DEFAULT_STACK_ACTIVE_SZB)"\n\t"
+     ".previous\n"
+ );
++#elif defined(VGP_s390x_openedition)
++extern void _start(void); 
+ #elif defined(VGP_arm_linux)
+ asm("\n"
+     "\t.text\n"
+@@ -3095,7 +3100,9 @@ asm(
+ #define _GNU_SOURCE
+ #define _FILE_OFFSET_BITS 64
+ /* This is in order to get AT_NULL and AT_PAGESIZE. */
++#ifndef VGO_openedition
+ #include <elf.h>
++#endif
+ /* --- !!! --- EXTERNAL HEADERS end --- !!! --- */
+ 
+ /* Avoid compiler warnings: this fn _is_ used, but labelling it

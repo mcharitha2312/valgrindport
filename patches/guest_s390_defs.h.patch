@@ -1,7 +1,5 @@
 diff --git a/VEX/priv/guest_s390_defs.h b/VEX/priv/guest_s390_defs.h
-old mode 100644
-new mode 100755
-index a64d563ec..aa70da3f9
+index a64d563ec..aa70da3f9 100644
 --- a/VEX/priv/guest_s390_defs.h
 +++ b/VEX/priv/guest_s390_defs.h
 @@ -69,10 +69,11 @@ extern VexGuestLayout s390xGuest_layout;

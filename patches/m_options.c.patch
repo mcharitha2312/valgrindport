@@ -1,0 +1,13 @@
+diff --git a/coregrind/m_options.c b/coregrind/m_options.c
+index ecbe9fc3a..e7d024bc2 100644
+--- a/coregrind/m_options.c
++++ b/coregrind/m_options.c
+@@ -168,7 +168,7 @@ VgXTMemory VG_(clo_xtree_memory) =  Vg_XTMemory_None;
+ const HChar* VG_(clo_xtree_memory_file) = "xtmemory.kcg.%p";
+ Bool VG_(clo_xtree_compress_strings) = True;
+ 
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ Bool VG_(clo_enable_debuginfod) = True;
+ #endif
+ Int    VG_(clo_dump_error)     = 0;

@@ -1,0 +1,21 @@
+diff --git a/coregrind/m_cache.c b/coregrind/m_cache.c
+index d12941cd6..b06b67f50 100644
+--- a/coregrind/m_cache.c
++++ b/coregrind/m_cache.c
+@@ -564,9 +564,14 @@ ecag(UInt ai, UInt li, UInt ti)
+    register ULong result asm("2") = 0;
+    register ULong input  asm("3") = (ai << 4) | (li << 1) | ti;
+ 
+-   asm volatile(".short 0xeb20\n\t"
+-                ".long  0x3000004c\n\t"
++#if defined(VGO_openedition)
++   asm volatile(" ECAG %0,0,0(%1)"
+                  : "=d" (result) : "d" (input));
++#else
++   asm volatile(" .short 0xeb20\n\t"
++                " .long  0x3000004c\n\t"
++                 : "=d" (result) : "d" (input));
++#endif
+ 
+    return result;
+ }

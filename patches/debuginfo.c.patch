@@ -1,0 +1,53 @@
+diff --git a/coregrind/m_debuginfo/debuginfo.c b/coregrind/m_debuginfo/debuginfo.c
+index 11ab47354..fc3adaae2 100644
+--- a/coregrind/m_debuginfo/debuginfo.c
++++ b/coregrind/m_debuginfo/debuginfo.c
+@@ -57,7 +57,8 @@
+ #include "priv_tytypes.h"
+ #include "priv_storage.h"
+ #include "priv_readdwarf.h"
+-#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++    || defined(VGO_openedition)
+ # include "priv_readelf.h"
+ # include "priv_readdwarf3.h"
+ # include "priv_readpdb.h"
+@@ -815,7 +816,8 @@ void VG_(di_initialise) ( void )
+ /*---                                                        ---*/
+ /*--------------------------------------------------------------*/
+ 
+-#if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd) \
++	|| defined(VGO_openedition)
+ 
+ /* Helper (indirect) for di_notify_ACHIEVE_ACCEPT_STATE */
+ static Bool overlaps_DebugInfoMappings ( const DebugInfoMapping* map1,
+@@ -966,7 +968,8 @@ static ULong di_notify_ACHIEVE_ACCEPT_STATE ( struct _DebugInfo* di )
+    truncate_DebugInfoMapping_overlaps( di, di->fsm.maps );
+ 
+    /* And acquire new info. */
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++   || defined(VGO_openedition)
+    ok = ML_(read_elf_object)( di );
+    if (ok)
+       di->deferred = True;
+@@ -1374,7 +1377,8 @@ ULong VG_(di_notify_mmap)( Addr a, Bool allow_SkFileV, Int use_fd )
+ #endif
+ 
+    /* We're only interested in mappings of object files. */
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) \
++   || defined(VGO_openedition)
+ 
+    expected_rw_load_count = 0;
+ 
+@@ -2496,7 +2500,7 @@ Vg_FnNameKind VG_(get_fnname_kind) ( const HChar* name )
+       return Vg_FnNameMain;
+ 
+    } else if (
+-#      if defined(VGO_linux)
++#      if defined(VGO_linux) || defined(VGO_openedition)
+        VG_STREQ("__libc_start_main",  name) ||  // glibc glibness
+        VG_STREQ("__libc_start_call_main",  name) ||  // glibc glibness
+        VG_STREQN(18, "__libc_start_main.", name) || // gcc optimization

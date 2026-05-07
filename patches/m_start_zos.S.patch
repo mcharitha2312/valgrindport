@@ -1,0 +1,95 @@
+diff --git a/coregrind/m_start_zos.S b/coregrind/m_start_zos.S
+new file mode 100644
+index 000000000..41a702e98
+--- /dev/null
++++ b/coregrind/m_start_zos.S
+@@ -0,0 +1,89 @@
++/*--------------------------------------------------------------------*/
++/*--- z/OS startup code                          m_start_zos.S     ---*/
++/*--------------------------------------------------------------------*/
++
++/*
++   This file is part of Valgrind, a dynamic binary instrumentation
++   framework.
++
++   Copyright (C) 2000-2026 Valgrind Developers
++
++   This program is free software; you can redistribute it and/or
++   modify it under the terms of the GNU General Public License as
++   published by the Free Software Foundation; either version 3 of the
++   License, or (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, see <http://www.gnu.org/licenses/>.
++
++   The GNU General Public License is contained in the file COPYING.
++*/
++
++#include "pub_core_basics_asm.h"
++
++/*---------------- s390x-openedition ----------------*/
++#if defined(VGP_s390x_openedition)
++
++/*
++   This is the canonical entry point, usually the first thing in the text
++   segment. Most registers' values are unspecified, except for:
++
++   %r14         Contains a function pointer to be registered with `atexit'.
++                This is how the dynamic linker arranges to have DT_FINI
++                functions called for shared libraries that have been loaded
++                before this code runs.
++
++   %r15         The stack contains the arguments and environment:
++                0(%r15)              argc
++                8(%r15)              argv[0]
++                ...
++                (8*argc)(%r15)       NULL
++                (8*(argc+1))(%r15)   envp[0]
++                ...
++                                     NULL
++*/
++
++.global _start
++.type   _start,@function
++_start:
++        /* Set up the new stack in %r1 */
++        larl    %r1, vgPlain_interim_stack
++        larl    %r5, .Lguard_size
++        ag      %r1, 0(%r5)
++        larl    %r5, .Lactive_size
++        ag      %r1, 0(%r5)
++        nill    %r1, 0xFFF0
++        
++        /* Install new stack and save original */
++        lgr     %r2, %r15
++        lgr     %r15, %r1
++        
++        /* Call _start_in_C_linux, passing it the startup %r15 */
++        brasl   %r14, _start_in_C_linux
++        
++        /* Trigger execution of an invalid opcode -> halt machine */
++        j       .Lhalt
++.Lhalt:
++        j       .Lhalt
++        
++        /* Data constants */
++        .align  8
++.Lguard_size:
++        .quad   8192                    /* VG_STACK_GUARD_SZB */
++.Lactive_size:
++        .quad   1048576                 /* VG_DEFAULT_STACK_ACTIVE_SZB */
++
++.size _start, .-_start
++
++#endif /* VGP_s390x_openedition */
++
++/* Let the linker know we don't need an executable stack */
++#if defined(__linux__) && defined(__ELF__)
++.section .note.GNU-stack,"",@progbits
++#endif
++

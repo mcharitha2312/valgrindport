@@ -1,0 +1,31 @@
+diff --git a/coregrind/m_debuglog.c b/coregrind/m_debuglog.c
+index cad95bcbe..c3c2775f4 100644
+--- a/coregrind/m_debuglog.c
++++ b/coregrind/m_debuglog.c
+@@ -393,7 +393,7 @@ static UInt local_sys_getpid ( void )
+    return __res;
+ }
+ 
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+ 
+ static UInt local_sys_write_stderr ( const HChar* buf, Int n )
+ {
+@@ -404,7 +404,7 @@ static UInt local_sys_write_stderr ( const HChar* buf, Int n )
+    ULong __res;
+ 
+    __asm__ __volatile__ (
+-      "svc %c1\n"
++      " svc %c1\n"
+       : "=d" (r2_res)
+       : "i" (__NR_write),
+         "0" (r2),
+@@ -424,7 +424,7 @@ static UInt local_sys_getpid ( void )
+    ULong __res;
+ 
+    __asm__ __volatile__ (
+-      "svc %c1\n"
++      " svc %c1\n"
+       : "=d" (r2)
+       : "i" (__NR_getpid)
+       : "cc", "memory");

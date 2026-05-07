@@ -1,0 +1,13 @@
+diff --git a/include/pub_tool_vki.h b/include/pub_tool_vki.h
+index 7b6e71e11..474df9f96 100644
+--- a/include/pub_tool_vki.h
++++ b/include/pub_tool_vki.h
+@@ -48,6 +48,8 @@
+ #  include "vki/vki-linux-drm.h"
+ #  include "vki/vki-linux-io_uring.h"
+ #  include "vki/vki-linux-landlock.h"
++#elif defined(VGO_openedition)
++#  include "vki/vki-linux.h"
+ #elif defined(VGO_darwin)
+ #  include "vki/vki-darwin.h"
+ #elif defined(VGO_solaris)

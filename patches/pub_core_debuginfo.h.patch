@@ -1,0 +1,13 @@
+diff --git a/coregrind/pub_core_debuginfo.h b/coregrind/pub_core_debuginfo.h
+index 64fcd3428..def3eff6d 100644
+--- a/coregrind/pub_core_debuginfo.h
++++ b/coregrind/pub_core_debuginfo.h
+@@ -60,7 +60,7 @@ extern void VG_(di_initialise) ( void );
+    released by simply re-opening and closing the same file (even via
+    different fd!).
+ */
+-#if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_freebsd) || defined(VGO_openedition)
+ extern ULong VG_(di_notify_mmap)( Addr a, Bool allow_SkFileV, Int use_fd );
+ 
+ extern void VG_(di_notify_munmap)( Addr a, SizeT len );

@@ -1,0 +1,49 @@
+diff --git a/coregrind/m_libcsignal.c b/coregrind/m_libcsignal.c
+index a32b53a2f..cf6228bf4 100644
+--- a/coregrind/m_libcsignal.c
++++ b/coregrind/m_libcsignal.c
+@@ -215,7 +215,7 @@ void VG_(sigcomplementset)( vki_sigset_t* dst, const vki_sigset_t* src )
+ */
+ Int VG_(sigprocmask)( Int how, const vki_sigset_t* set, vki_sigset_t* oldset)
+ {
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) || defined(VGO_openedition)
+ #  if defined(__NR_rt_sigprocmask)
+    SysRes res = VG_(do_syscall4)(__NR_rt_sigprocmask, 
+                                  how, (UWord)set, (UWord)oldset, 
+@@ -260,7 +260,7 @@ Int VG_(sigaction) ( Int signum,
+                      const vki_sigaction_toK_t* act,  
+                      vki_sigaction_fromK_t* oldact)
+ {
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) || defined(VGO_openedition)
+    /* Normal case: vki_sigaction_toK_t and vki_sigaction_fromK_t are
+       identical types. */
+    SysRes res = VG_(do_syscall4)(__NR_rt_sigaction,
+@@ -342,7 +342,7 @@ void
+ VG_(convert_sigaction_fromK_to_toK)( const vki_sigaction_fromK_t* fromK,
+                                      /*OUT*/vki_sigaction_toK_t* toK )
+ {
+-#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd) || defined(VGO_openedition)
+    *toK = *fromK;
+ #  elif defined(VGO_darwin)
+    toK->ksa_handler = fromK->ksa_handler;
+@@ -357,7 +357,7 @@ VG_(convert_sigaction_fromK_to_toK)( const vki_sigaction_fromK_t* fromK,
+ 
+ Int VG_(kill)( Int pid, Int signo )
+ {
+-#  if defined(VGO_linux) || defined(VGO_solaris)
++#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_openedition)
+    SysRes res = VG_(do_syscall2)(__NR_kill, pid, signo);
+ #  elif defined(VGO_darwin) || defined(VGO_freebsd)
+    SysRes res = VG_(do_syscall3)(__NR_kill,
+@@ -428,7 +428,7 @@ Int VG_(tkill)( Int lwpid, Int signo )
+ 
+ /* ---------- sigtimedwait_zero: Linux ----------- */
+ 
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_openedition)
+ Int VG_(sigtimedwait_zero)( const vki_sigset_t *set,
+                             vki_siginfo_t *info )
+ {

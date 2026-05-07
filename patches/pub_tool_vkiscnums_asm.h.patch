@@ -1,0 +1,13 @@
+diff --git a/include/pub_tool_vkiscnums_asm.h b/include/pub_tool_vkiscnums_asm.h
+index f97a3af3a..90e1c24be 100644
+--- a/include/pub_tool_vkiscnums_asm.h
++++ b/include/pub_tool_vkiscnums_asm.h
+@@ -49,7 +49,7 @@
+ #  include "vki/vki-scnums-shared-linux.h"
+ #  include "vki/vki-scnums-ppc64-linux.h"
+ 
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+ #  include "vki/vki-scnums-shared-linux.h"
+ #  include "vki/vki-scnums-s390x-linux.h"
+ 

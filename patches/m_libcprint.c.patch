@@ -1,0 +1,31 @@
+diff --git a/coregrind/m_libcprint.c b/coregrind/m_libcprint.c
+index 593889da9..5271fb9d7 100644
+--- a/coregrind/m_libcprint.c
++++ b/coregrind/m_libcprint.c
+@@ -256,7 +256,7 @@ void VG_(print_preamble)(Bool logging_to_fd)
+       VG_(umsg)("\n");
+ 
+    if (VG_(clo_verbosity) > 1) {
+-# if defined(VGO_linux)
++# if defined(VGO_linux) || defined(VGO_openedition)
+       SysRes fd;
+ # endif
+       VexArch vex_arch;
+@@ -270,7 +270,7 @@ void VG_(print_preamble)(Bool logging_to_fd)
+                      *(HChar **) VG_(indexXA)( VG_(args_for_valgrind), i));
+       }
+ 
+-# if defined(VGO_linux)
++# if defined(VGO_linux) || defined(VGO_openedition)
+       VG_(message)(Vg_DebugMsg, "Contents of /proc/version:\n");
+       fd = VG_(open)("/proc/version", VKI_O_RDONLY, 0);
+       if (sr_isError(fd)) {
+@@ -1194,7 +1194,7 @@ void VG_(err_config_error) ( const HChar* format, ... )
+    VG_(sr_as_string)()
+    ------------------------------------------------------------------ */
+ 
+-#if defined(VGO_linux) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_freebsd) || defined(VGO_openedition)
+ // FIXME: Does this function need to be adjusted for MIPS's _valEx ?
+ const HChar *VG_(sr_as_string) ( SysRes sr )
+ {

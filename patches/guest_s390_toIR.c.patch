@@ -1,7 +1,5 @@
 diff --git a/VEX/priv/guest_s390_toIR.c b/VEX/priv/guest_s390_toIR.c
-old mode 100644
-new mode 100755
-index 6da599645..d9d746c38
+index 6da599645..d9d746c38 100644
 --- a/VEX/priv/guest_s390_toIR.c
 +++ b/VEX/priv/guest_s390_toIR.c
 @@ -8,7 +8,7 @@

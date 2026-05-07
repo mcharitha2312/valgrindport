@@ -1,0 +1,13 @@
+diff --git a/coregrind/m_debuginfo/d3basics.c b/coregrind/m_debuginfo/d3basics.c
+index 564b832e6..692c9a459 100644
+--- a/coregrind/m_debuginfo/d3basics.c
++++ b/coregrind/m_debuginfo/d3basics.c
+@@ -543,7 +543,7 @@ static Bool get_Dwarf_Reg( /*OUT*/Addr* a, Word regno, const RegSummary* regs )
+ #  elif defined(VGP_arm_linux)
+    if (regno == 13) { *a = regs->sp; return True; }
+    if (regno == 11) { *a = regs->fp; return True; } 
+-#  elif defined(VGP_s390x_linux)
++#  elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+    if (regno == 15) { *a = regs->sp; return True; }
+    if (regno == 11) { *a = regs->fp; return True; }
+ #  elif defined(VGP_mips32_linux) || defined(VGP_nanomips_linux)

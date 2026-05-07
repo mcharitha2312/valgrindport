@@ -1,0 +1,32 @@
+diff --git a/coregrind/m_cpuid.S b/coregrind/m_cpuid.S
+index 4885e2e20..ba109acb1 100644
+--- a/coregrind/m_cpuid.S
++++ b/coregrind/m_cpuid.S
+@@ -61,6 +61,12 @@
+     VG_(has_cpuid):
+         movq    $1, %rax
+         ret
++#elif defined(VGA_s390x)
++.text
++.globl VG_(has_cpuid)
++    VG_(has_cpuid):
++        lghi    %r2, 0          # s390x doesn't have CPUID, return 0
++        br      %r14            # return
+ #endif
+ 
+ /*
+@@ -147,6 +153,14 @@
+         movq    %rbp, %rsp
+         popq    %rbp
+         ret
++#elif defined(VGA_s390x)
++.text
++.globl VG_(cpuid)
++    VG_(cpuid):
++        # s390x doesn't have CPUID instruction
++        # This is a stub that does nothing
++        # Parameters are ignored
++        br      %r14            # return immediately
+ #endif
+ 
+ /* Let the linker know we don't need an executable stack */

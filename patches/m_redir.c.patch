@@ -1,0 +1,46 @@
+diff --git a/coregrind/m_redir.c b/coregrind/m_redir.c
+index 6c360d59c..23b9e62e7 100644
+--- a/coregrind/m_redir.c
++++ b/coregrind/m_redir.c
+@@ -1243,7 +1243,7 @@ Addr VG_(redir_do_lookup) ( Addr orig, Bool* isWrap )
+    Considers various VG_U_LD* entries from pub_tool_redir.h. */
+ Bool VG_(is_soname_ld_so) (const HChar *soname)
+ {
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) 
+    if (VG_STREQ(soname, VG_U_LD_LINUX_SO_3))         return True;
+    if (VG_STREQ(soname, VG_U_LD_LINUX_SO_2))         return True;
+    if (VG_STREQ(soname, VG_U_LD_LINUX_X86_64_SO_2))  return True;
+@@ -1253,6 +1253,17 @@ Bool VG_(is_soname_ld_so) (const HChar *soname)
+    if (VG_STREQ(soname, VG_U_LD_LINUX_AARCH64_SO_1)) return True;
+    if (VG_STREQ(soname, VG_U_LD_LINUX_ARMHF_SO_3))   return True;
+    if (VG_STREQ(soname, VG_U_LD_LINUX_MIPSN8_S0_1))  return True;
++#  elif defined(VGO_openedition) 
++   return False; 
++   /*   if (VG_STREQ(soname, VG_U_LD_LINUX_SO_3))         return True; 
++   if (VG_STREQ(soname, VG_U_LD_LINUX_SO_2))         return True;  
++   if (VG_STREQ(soname, VG_U_LD_LINUX_X86_64_SO_2))  return True;
++   if (VG_STREQ(soname, VG_U_LD64_SO_1))             return True;
++   if (VG_STREQ(soname, VG_U_LD64_SO_2))             return True;
++   if (VG_STREQ(soname, VG_U_LD_SO_1))               return True;
++   if (VG_STREQ(soname, VG_U_LD_LINUX_AARCH64_SO_1)) return True;
++   if (VG_STREQ(soname, VG_U_LD_LINUX_ARMHF_SO_3))   return True;
++   if (VG_STREQ(soname, VG_U_LD_LINUX_MIPSN8_S0_1))  return True; */
+ #  elif defined(VGO_freebsd)
+    if (VG_STREQ(soname, VG_U_LD_ELF_SO_1))   return True;
+    if (VG_STREQ(soname, VG_U_LD_ELF32_SO_1))   return True;
+@@ -1734,6 +1745,14 @@ void VG_(redir_initialise) ( void )
+       add_hardwired_spec("/lib/amd64/ld.so.1", "strlen",
+                          (Addr)&VG_(amd64_solaris_REDIR_FOR_strlen), NULL);
+    }
++#  elif defined(VGO_openedition)
++      
++   if (0==VG_(strcmp)("Memcheck", VG_(details).name)) {
++      // added in rsponse to BZ 327943
++//      add_hardwired_spec("ld64.so.1", "index",
++//                         (Addr)&VG_(s390x_linux_REDIR_FOR_index),
++//                         complain_about_stripped_glibc_ldso); 
++   }
+ 
+ #  else
+ #    error Unknown platform

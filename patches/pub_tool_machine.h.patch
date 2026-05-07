@@ -1,0 +1,13 @@
+diff --git a/include/pub_tool_machine.h b/include/pub_tool_machine.h
+index f46207257..50455d9b4 100644
+--- a/include/pub_tool_machine.h
++++ b/include/pub_tool_machine.h
+@@ -71,7 +71,7 @@
+ #  define VG_CLREQ_SZB             20
+ #  define VG_STACK_REDZONE_SZB      0
+ 
+-#elif defined(VGP_s390x_linux)
++#elif defined(VGP_s390x_linux) || defined(VGP_s390x_openedition)
+ #  define VG_MIN_INSTR_SZB          2
+ #  define VG_MAX_INSTR_SZB          6
+ #  define VG_CLREQ_SZB             10

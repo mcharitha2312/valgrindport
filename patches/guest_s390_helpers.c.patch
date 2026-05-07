@@ -1,7 +1,5 @@
 diff --git a/VEX/priv/guest_s390_helpers.c b/VEX/priv/guest_s390_helpers.c
-old mode 100644
-new mode 100755
-index 94d0a242d..4ba505c50
+index 94d0a242d..e6f357c1b 100644
 --- a/VEX/priv/guest_s390_helpers.c
 +++ b/VEX/priv/guest_s390_helpers.c
 @@ -260,10 +260,9 @@ VexGuestLayout s390xGuest_layout = {
@@ -509,11 +507,11 @@ index 94d0a242d..4ba505c50
 -         "ipm %[psw]\n\t"          : [psw] "=d"(psw), [tmp] "=f"(tmp)   \
 +         " " opcode " %[tmp],%[op]," #rounding_mode ",0\n\t"                \
 +         " ipm %[psw]\n\t"          : [psw] "=d"(psw), [tmp] "=f"(tmp)   \
-                                    : [op] "f"(op.f)                     \
-                                    : "cc");                             \
-       psw >> 28;   /* cc */                                             \
-    })
- 
++                                   : [op] "f"(op.f)                     \
++                                   : "cc");                             \
++      psw >> 28;   /* cc */                                             \
++   })
++
 +#define S390_CC_FOR_DFP128_CONVERT_AUX_ZOS(opcode,hi,lo,rounding_mode)      \
 +   ({                                                                   \
 +      union s390x_F128 op = { .i = { hi, lo } };                        \
@@ -521,11 +519,11 @@ index 94d0a242d..4ba505c50
 +      __asm__ volatile (                                                \
 +         " " opcode " %[tmp],%[op]," #rounding_mode "\n\t"                \
 +         " ipm %[psw]\n\t"          : [psw] "=d"(psw), [tmp] "=f"(tmp)   \
-+                                   : [op] "f"(op.f)                     \
-+                                   : "cc");                             \
-+      psw >> 28;   /* cc */                                             \
-+   })
-+
+                                    : [op] "f"(op.f)                     \
+                                    : "cc");                             \
+       psw >> 28;   /* cc */                                             \
+    })
+ 
 +#define S390_CC_FOR_DFP128_CONVERT_ZOS(opcode,cc_dep1,cc_dep2,cc_ndep)       \
 +   ({                                                                    \
 +      UInt cc;                                                           \
@@ -705,9 +703,9 @@ index 94d0a242d..4ba505c50
 -           "tm %[value],0\n\t"            /* this is skipped, then EXecuted */
 -           "1: ex %[mask],0(%[pc])\n\t"   /* EXecute TM after modifying mask */
 -           "ipm %[psw]\n\t"             : [psw] "=d"(psw), [pc] "=&a"(pc)
-+           " la %[pc],1f\n"             /* pc = address of next insn */
-+           " tm %[value],0\n"            /* this is skipped, then EXecuted */
-+           " ex %[mask],0(%[pc])\n\t"   /* EXecute TM after modifying mask */
++           " bras %[pc],*+8\n\t"            /* pc = address of next insn */
++	   " tm %[value],0\n"            /* this is skipped, then EXecuted */
++	   " ex %[mask],0(%[pc])\n\t"   /* EXecute TM after modifying mask */
 +           " ipm %[psw]\n\t"             : [psw] "=d"(psw), [pc] "=&a"(pc)
                                          : [value] "Q"(value), [mask] "a"(mask)
                                          : "cc");
@@ -1039,7 +1037,7 @@ index 94d0a242d..4ba505c50
     case S390_VEC_OP_VFTCI:
        the_insn.VRIe.v1 = 1;
        the_insn.VRIe.v2 = 2;
-@@ -2619,33 +2827,32 @@ s390x_dirtyhelper_vec_op(VexGuestS390XState *guest_state,
+@@ -2619,33 +2827,33 @@ s390x_dirtyhelper_vec_op(VexGuestS390XState *guest_state,
  
     const V128* guest_v = &(guest_state->guest_v0);
     __asm__ volatile (
@@ -1079,6 +1077,7 @@ index 94d0a242d..4ba505c50
 +      " ex %[zero],%[insn]\n"
 +
 +      " cgr %[read_only],0\n"
++      " jnz *+14\n"
 +      " lgr 10,%[res]\n"
 +      " vst 1,0(0,10)\n"
 +
@@ -1099,7 +1098,7 @@ index 94d0a242d..4ba505c50
  
     return psw >> 28;   /* cc */
  }
-@@ -2701,9 +2908,10 @@ s390x_dirtyhelper_PPNO_sha512(VexGuestS390XState *guest_state, ULong r1, ULong r
+@@ -2701,9 +2909,10 @@ s390x_dirtyhelper_PPNO_sha512(VexGuestS390XState *guest_state, ULong r1, ULong r
     register ULong reg5 asm("5") = op2[1];
  
     ULong cc = 0;

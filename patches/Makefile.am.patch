@@ -1,0 +1,20 @@
+diff --git a/coregrind/Makefile.am b/coregrind/Makefile.am
+index 5491fc672..cd60e6327 100644
+--- a/coregrind/Makefile.am
++++ b/coregrind/Makefile.am
+@@ -344,6 +344,7 @@ COREGRIND_SOURCES_COMMON = \
+ 	m_threadstate.c \
+ 	m_tooliface.c \
+ 	m_trampoline.S \
++	m_start_zos.S \
+ 	m_translate.c \
+ 	m_transtab.c \
+ 	m_vki.c \
+@@ -529,7 +530,6 @@ libnolto_coregrind_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_CCASFLAGS = \
+     $(AM_CCASFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
+ endif
+ 
+-
+ libcoregrind_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_SOURCES = \
+     $(COREGRIND_SOURCES_COMMON)
+ nodist_libcoregrind_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_SOURCES = \
